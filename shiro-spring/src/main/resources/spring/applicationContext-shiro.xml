@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- Shiro过滤器 -->
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <property name="securityManager" ref="securityManager"/>
+        <property name="loginUrl" value="login.html"/>
+        <property name="successUrl" value="index.html"/>
+        <property name="unauthorizedUrl" value="403.html"/>
+        <!-- 配置过滤器链 -->
+        <property name="filterChainDefinitions">
+            <value>
+                /login.html = anon
+                /login = anon
+
+                /testRole = roles["admin1"]
+                /testRoles = roles["admin1", "admin8"]
+                /testPerm = perms["user:insert"]
+                /testPerms = perms["user:insert", "user:select"]
+
+                /testRolesOr = rolesOr["admin11", "admin8"]
+
+                /* = authc
+            </value>
+        </property>
+        <!-- 配置自定义过滤器 -->
+        <property name="filters">
+            <map>
+                <entry key="rolesOr" value-ref="rolesOrFilter"/>
+            </map>
+        </property>
+    </bean>
+
+    <!-- 自定义过滤器 -->
+    <bean id="rolesOrFilter" class="com.baicai.filter.RolesOrFilter"/>
+
+
+    <!-- SecurityManager -->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <property name="realm" ref="realm"/>
+        <property name="sessionManager" ref="sessionManager"/>
+        <property name="cacheManager" ref="redisCacheManager"/>
+        <property name="rememberMeManager" ref="cookieRememberMeManager"/>
+    </bean>
+
+    <!-- 自定义Realm-->
+    <bean id="realm" class="com.baicai.realm.MyJdbcRealm">
+        <property name="credentialsMatcher" ref="hashedCredentialsMatcher"/>
+    </bean>
+    <!-- 加密 -->
+    <bean id="hashedCredentialsMatcher" class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
+        <property name="hashAlgorithmName" value="MD5"/>
+        <property name="hashIterations" value="1"/>
+    </bean>
+
+    <!-- Session管理器 -->
+    <!--<bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">-->
+    <!-- 自定义Session管理器 -->
+    <bean id="sessionManager" class="com.baicai.session.CustomSessionManager">
+        <property name="sessionDAO" ref="redisSessionDao"/>
+    </bean>
+    <!-- 自定义SessionDao -->
+    <bean id="redisSessionDao" class="com.baicai.session.RedisSessionDao"/>
+
+    <!-- Cache管理器 -->
+    <bean id="redisCacheManager" class="com.baicai.cache.RedisCacheManager"/>
+
+    <!-- RememberMe -->
+    <bean id="cookieRememberMeManager" class="org.apache.shiro.web.mgt.CookieRememberMeManager">
+        <property name="cookie" ref="simpleCookie"/>
+    </bean>
+    <bean id="simpleCookie" class="org.apache.shiro.web.servlet.SimpleCookie">
+        <!-- name属性，设置到Cookie中的key -->
+        <constructor-arg value="rememberMe"/>
+        <!-- 有效期（秒），默认一年 -->
+        <property name="maxAge" value="120"/>
+    </bean>
+</beans>

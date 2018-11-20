@@ -17,5 +17,6 @@
 
     <modules>
         <module>shiro-helloworld</module>
+        <module>shiro-spring</module>
     </modules>
 </project>

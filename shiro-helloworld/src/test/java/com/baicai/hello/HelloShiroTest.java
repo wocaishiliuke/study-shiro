@@ -3,6 +3,7 @@ package com.baicai.hello;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.baicai.realm.MyRealm;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.realm.SimpleAccountRealm;
 import org.apache.shiro.realm.jdbc.JdbcRealm;
@@ -49,6 +50,12 @@ public class HelloShiroTest {
 
         // 方式四：自定义Realm
         MyRealm realm = new MyRealm();
+
+        //加密
+        HashedCredentialsMatcher matcher = new HashedCredentialsMatcher();
+        matcher.setHashAlgorithmName("md5");
+        matcher.setHashIterations(1);
+        realm.setCredentialsMatcher(matcher);
 
         securityManager.setRealm(realm);
         SecurityUtils.setSecurityManager(securityManager);

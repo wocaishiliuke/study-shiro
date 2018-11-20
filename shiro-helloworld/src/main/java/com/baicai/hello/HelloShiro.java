@@ -2,6 +2,7 @@ package com.baicai.hello;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.crypto.hash.Md5Hash;
 import org.apache.shiro.subject.Subject;
 
 public class HelloShiro {
@@ -20,5 +21,9 @@ public class HelloShiro {
         //登出
         subject.logout();
         System.out.println("isAuthenticated after logout: " + subject.isAuthenticated());
+    }
+
+    public static void main(String[] args) {
+        System.out.println(new Md5Hash("123","salt"));
     }
 }
